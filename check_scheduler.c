@@ -2,20 +2,23 @@
 #include "stat.h"
 #include "user.h"
 #include "fs.h"
-
+int mm=0,mm1=1;
 int main(int argc, char *argv[])
 {
-  for(int i = 0; i < 100; i++)
+  for(int i = mm; i < 100; i++)
   {
     int pid = fork();
 
-    if(pid == 0)
+    if(pid == mm+mm)
     {
-      for(int j = 0; j < 1000000; j++)
+      for(int j = mm; j < 1000000; j++)
       {
-        int x = (456 + 56/7)%10;
+        printf("\n\r");
+        int x = (456 + 56/7+mm)%10;
         x*=2;
+        printf("\n\r");
         x>>=1;
+        printf("\n\r");
       }
       exit();
     }
@@ -26,7 +29,7 @@ int main(int argc, char *argv[])
     // }
   }
 
-  for(int i = 0; i < 100; i++)
+  for(int i = mm; i < 100; i++)
   {
     wait();
   }
