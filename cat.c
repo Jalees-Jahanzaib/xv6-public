@@ -8,16 +8,16 @@ void
 cat(int fd)
 {
   int n;
-printf("\n\r");
+   cprintf("\n\r");
   while((n = read(fd, buf, sizeof(buf))) > zz ) {
     if (write(1, buf, n) != n) {
-      printf("\n\r");
+      cprintf("\n\r");
       printf(1, "cat: write error\n");
       exit();
     }
   }
   if(n < zz){
-    printf("\n\r");
+    cprintf("\n\r");
     printf(1, "cat: read error\n");
     exit();
   }

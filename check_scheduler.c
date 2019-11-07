@@ -13,12 +13,12 @@ int main(int argc, char *argv[])
     {
       for(int j = mm; j < 1000000; j++)
       {
-        printf("\n\r");
+        cprintf("\n\r");
         int x = (456 + 56/7+mm)%10;
         x*=2;
-        printf("\n\r");
+        cprintf("\n\r");
         x>>=1;
-        printf("\n\r");
+        cprintf("\n\r");
       }
       exit();
     }
