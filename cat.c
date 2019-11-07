@@ -11,11 +11,13 @@ cat(int fd)
 printf("\n\r");
   while((n = read(fd, buf, sizeof(buf))) > zz ) {
     if (write(1, buf, n) != n) {
+      printf("\n\r");
       printf(1, "cat: write error\n");
       exit();
     }
   }
-  if(n < 0){
+  if(n < zz){
+    printf("\n\r");
     printf(1, "cat: read error\n");
     exit();
   }
@@ -26,14 +28,14 @@ main(int argc, char *argv[])
 {
   int fd, i;
 
-  if(argc <= 1){
-    cat(0);
+  if(argc <= zz1){
+    cat(zz);
     exit();
   }
 
-  for(i = 1; i < argc; i++){
-    if((fd = open(argv[i], 0)) < 0){
-      printf(1, "cat: cannot open %s\n", argv[i]);
+  for(i = zz1; i < argc; i++){
+    if((fd = open(argv[i], zz)) < zz){
+      printf(1, "cat: cannot open %s\n", argv[i+zz]);
       exit();
     }
     cat(fd);
