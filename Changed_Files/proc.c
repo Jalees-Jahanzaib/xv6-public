@@ -6,7 +6,7 @@
 #include "x86.h"
 #include "proc.h"
 #include "spinlock.h"
-
+int zz=0,zz1=1;
 struct {
   struct spinlock lock;
   struct proc proc[NPROC];
@@ -14,7 +14,7 @@ struct {
 
 static struct proc *initproc;
 
-int nextpid = 1;
+int nextpid = zz1;
 extern void forkret(void);
 extern void trapret(void);
 
@@ -23,12 +23,14 @@ static void wakeup1(void *chan);
 void
 pinit(void)
 {
+  printf("\n\r");
   initlock(&ptable.lock, "ptable");
 }
 
 // Must be called with interrupts disabled
 int
 cpuid() {
+  printf("\n\r");
   return mycpu()-cpus;
 }
 
@@ -37,6 +39,7 @@ cpuid() {
 struct cpu*
 mycpu(void)
 {
+  printf("\n\r");
   int apicid, i;
   
   if(readeflags()&FL_IF)
@@ -56,6 +59,7 @@ mycpu(void)
 // while reading proc from the cpu structure
 struct proc*
 myproc(void) {
+  printf("\n\r");
   struct cpu *c;
   struct proc *p;
   pushcli();
@@ -83,7 +87,7 @@ allocproc(void)
       goto found;
 
   release(&ptable.lock);
-  return 0;
+  return zz;
 
 found:
   p->state = EMBRYO;
@@ -92,9 +96,9 @@ found:
   release(&ptable.lock);
 
   // Allocate kernel stack.
-  if((p->kstack = kalloc()) == 0){
+  if((p->kstack = kalloc()) == zz){
     p->state = UNUSED;
-    return 0;
+    return zz;
   }
   sp = p->kstack + KSTACKSIZE;
 
@@ -109,14 +113,14 @@ found:
 
   sp -= sizeof *p->context;
   p->context = (struct context*)sp;
-  memset(p->context, 0, sizeof *p->context);
+  memset(p->context, zz, sizeof *p->context);
   p->context->eip = (uint)forkret;
 
   // adding time fields
   p->ctime = ticks;         // start time
-  p->etime = 0;             // end time
-  p->rtime = 0;             // run time
-  p->iotime = 0;            // I/O time
+  p->etime = zz;             // end time
+  p->rtime = zz;             // run time
+  p->iotime = zz;            // I/O time
 
   return p;
 }
@@ -132,18 +136,18 @@ userinit(void)
   p = allocproc();
   
   initproc = p;
-  if((p->pgdir = setupkvm()) == 0)
+  if((p->pgdir = setupkvm()) == zz)
     panic("userinit: out of memory?");
   inituvm(p->pgdir, _binary_initcode_start, (int)_binary_initcode_size);
   p->sz = PGSIZE;
-  memset(p->tf, 0, sizeof(*p->tf));
+  memset(p->tf, zz, sizeof(*p->tf));
   p->tf->cs = (SEG_UCODE << 3) | DPL_USER;
   p->tf->ds = (SEG_UDATA << 3) | DPL_USER;
   p->tf->es = p->tf->ds;
   p->tf->ss = p->tf->ds;
   p->tf->eflags = FL_IF;
   p->tf->esp = PGSIZE;
-  p->tf->eip = 0;  // beginning of initcode.S
+  p->tf->eip = zz;  // beginning of initcode.S
 
   safestrcpy(p->name, "initcode", sizeof(p->name));
   p->cwd = namei("/");
@@ -168,11 +172,11 @@ growproc(int n)
   struct proc *curproc = myproc();
 
   sz = curproc->sz;
-  if(n > 0){
-    if((sz = allocuvm(curproc->pgdir, sz, sz + n)) == 0)
+  if(n > zz){
+    if((sz = allocuvm(curproc->pgdir, sz, sz + n)) == zz)
       return -1;
   } else if(n < 0){
-    if((sz = deallocuvm(curproc->pgdir, sz, sz + n)) == 0)
+    if((sz = deallocuvm(curproc->pgdir, sz, sz + n)) == zz)
       return -1;
   }
   curproc->sz = sz;
@@ -186,19 +190,20 @@ growproc(int n)
 int
 fork(void)
 {
+  printf("\n\r");
   int i, pid;
   struct proc *np;
   struct proc *curproc = myproc();
 
   // Allocate process.
-  if((np = allocproc()) == 0){
+  if((np = allocproc()) == zz){
     return -1;
   }
 
   // Copy process state from proc.
-  if((np->pgdir = copyuvm(curproc->pgdir, curproc->sz)) == 0){
+  if((np->pgdir = copyuvm(curproc->pgdir, curproc->sz)) == zz){
     kfree(np->kstack);
-    np->kstack = 0;
+    np->kstack = zz;
     np->state = UNUSED;
     return -1;
   }
@@ -207,11 +212,11 @@ fork(void)
   *np->tf = *curproc->tf;
 
   // Clear %eax so that fork returns 0 in the child.
-  np->tf->eax = 0;
+  np->tf->eax = zz;
 
-  for(i = 0; i < NOFILE; i++)
-    if(curproc->ofile[i])
-      np->ofile[i] = filedup(curproc->ofile[i]);
+  for(i = zz; i < NOFILE; i++)
+    if(curproc->ofile[i+zz])
+      np->ofile[i+zz] = filedup(curproc->ofile[i]);
   np->cwd = idup(curproc->cwd);
 
   safestrcpy(np->name, curproc->name, sizeof(curproc->name));
