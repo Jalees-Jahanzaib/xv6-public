@@ -1,6 +1,5 @@
 struct stat;
 struct rtcdate;
-struct proc_stat;
 
 // system calls
 int fork(void);
@@ -25,10 +24,6 @@ char* sbrk(int);
 int sleep(int);
 int uptime(void);
 int waitx(int *wtime, int *rtime);
-int set_priority(int, int);
-#ifdef MLFQ
-    int getpinfo(int, struct proc_stat*);
-#endif
 
 // ulib.c
 int stat(const char*, struct stat*);

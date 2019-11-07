@@ -105,26 +105,3 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
-
-int
-sys_set_priority(void){
-  int pid, pr;
-  if(argint(0, &pid) < 0)
-    return -1;
-  if(argint(1, &pr) < 0)
-    return -1;
-  return set_priority(pid, pr);
-}
-
-#ifdef MLFQ
-  int
-  sys_getpinfo(void){
-    int pid;
-    struct proc_stat *stat;
-    if(argint(0, &pid) < 0)
-      return -1;
-    if(argint(1, (int*)&stat) < 0)
-      return -1;
-    return getpinfo(pid, stat);
-  }
-#endif

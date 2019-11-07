@@ -17,6 +17,16 @@ extern char end[]; // first address after kernel loaded from ELF file
 int
 main(void)
 {
+
+  #ifdef MLFQ
+		for(int i=0; i<NPQ; i++){
+			prq[i].front = -1;
+			prq[i].back = -1;
+			prq[i].max_rtime = 1 << i;
+			prq[i].max_wtime = 32;
+		}
+	#endif
+
   kinit1(end, P2V(4*1024*1024)); // phys page allocator
   kvmalloc();      // kernel page table
   mpinit();        // detect other processors

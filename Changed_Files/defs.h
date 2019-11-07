@@ -9,9 +9,6 @@ struct spinlock;
 struct sleeplock;
 struct stat;
 struct superblock;
-#ifdef MLFQ
-    struct proc_stat;
-#endif
 
 // bio.c
 void            binit(void);
@@ -122,13 +119,6 @@ void            sleep(void*, struct spinlock*);
 void            userinit(void);
 int             wait(void);
 int             waitx(int*, int*);
-// updates process time in trap.c
-void            update_process_time();
-int             set_priority(int, int);
-#ifdef MLFQ
-void            aging_proc(void);
-int             getpinfo(int, struct proc_stat*);
-#endif
 void            wakeup(void*);
 void            yield(void);
 

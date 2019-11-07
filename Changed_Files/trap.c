@@ -55,12 +55,13 @@ trap(struct trapframe *tf)
       release(&tickslock);
 
       // Update time fields
-      update_process_time();
-      #ifdef MLFQ
-        if(ticks%MLFQTICK == 0){
-          aging_proc();
-        }
-      #endif
+      if(myproc())
+      {
+        if(myproc()->state == RUNNING)
+          myproc()->rtime++;
+        else if(myproc()->state == SLEEPING)
+          myproc()->iotime++;
+      }
     }
     lapiceoi();
     break;
@@ -110,20 +111,11 @@ trap(struct trapframe *tf)
 
   // Force process to give up CPU on clock tick.
   // If interrupts were on while locks held, would need to check nlock.
-  #ifndef FCFS
-    #ifndef MLFQ
-      if(myproc() && myproc()->state == RUNNING && tf->trapno == T_IRQ0+IRQ_TIMER){
-          yield();
-      }
-    #else
-      if(ticks%MLFQTICK == 0 && myproc() && myproc()->state == RUNNING)
-        yield();
-      // if(myproc() && myproc()->state == RUNNING && myproc()->lrtime >= prq[myproc()->priority].max_rtime){
-      //   yield();
-      // }
-    #endif
-    // Check if the process has been killed since we yielded
-    if(myproc() && myproc()->killed && (tf->cs&3) == DPL_USER)
-      exit();
-  #endif
+  if(myproc() && myproc()->state == RUNNING &&
+     tf->trapno == T_IRQ0+IRQ_TIMER)
+    yield();
+
+  // Check if the process has been killed since we yielded
+  if(myproc() && myproc()->killed && (tf->cs&3) == DPL_USER)
+    exit();
 }

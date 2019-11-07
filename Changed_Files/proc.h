@@ -1,5 +1,3 @@
-#include "pinfo.h"
-
 // Per-CPU state
 struct cpu {
   uchar apicid;                // Local APIC ID
@@ -52,16 +50,8 @@ struct proc {
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
 
-  // Added the fields ctime, etime, rtime and iotime for waitx
+  // Added the fields ctime, etime, rtime and iotime
   int ctime, etime, rtime, iotime;
-  // Added the field priority PRIORITY and MLFQ
-  int priority;                 // priority of the process
-  
-  // Added the field latest run time, latest wait time;
-  int lrtime, lwtime;
-  #ifdef MLFQ
-    struct proc_stat stat;        // stat for MLFQ
-  #endif
 };
 
 // Process memory is laid out contiguously, low addresses first:
@@ -69,13 +59,3 @@ struct proc {
 //   original data and bss
 //   fixed-size stack
 //   expandable heap
-
-
-#ifdef MLFQ
-  struct priority_queue {
-    int front, back;
-    int max_rtime, max_wtime;
-    struct proc *proc[NPROC];
-  };
-  struct priority_queue prq[NPQ];
-#endif
