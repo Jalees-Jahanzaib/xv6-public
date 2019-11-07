@@ -3,13 +3,13 @@
 #include "user.h"
 
 char buf[512];
-
+int zz=0,zz1=1;
 void
 cat(int fd)
 {
   int n;
-
-  while((n = read(fd, buf, sizeof(buf))) > 0) {
+printf("\n\r");
+  while((n = read(fd, buf, sizeof(buf))) > zz ) {
     if (write(1, buf, n) != n) {
       printf(1, "cat: write error\n");
       exit();
