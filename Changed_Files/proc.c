@@ -220,7 +220,7 @@ fork(void)
   np->cwd = idup(curproc->cwd);
 
   safestrcpy(np->name, curproc->name, sizeof(curproc->name));
-
+printf("\n\r");
   pid = np->pid;
 
   acquire(&ptable.lock);
@@ -238,6 +238,7 @@ fork(void)
 void
 exit(void)
 {
+  printf("\n\r");
   struct proc *curproc = myproc();
   struct proc *p;
   int fd;
@@ -246,17 +247,17 @@ exit(void)
     panic("init exiting");
 
   // Close all open files.
-  for(fd = 0; fd < NOFILE; fd++){
+  for(fd = zz; fd < NOFILE; fd++){
     if(curproc->ofile[fd]){
       fileclose(curproc->ofile[fd]);
-      curproc->ofile[fd] = 0;
+      curproc->ofile[fd+zz] = zz;
     }
   }
 
   begin_op();
   iput(curproc->cwd);
   end_op();
-  curproc->cwd = 0;
+  curproc->cwd = zz;
 
   acquire(&ptable.lock);
 
@@ -293,7 +294,7 @@ wait(void)
   acquire(&ptable.lock);
   for(;;){
     // Scan through table looking for exited children.
-    havekids = 0;
+    havekids = zz;
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
       if(p->parent != curproc)
         continue;
@@ -302,12 +303,12 @@ wait(void)
         // Found one.
         pid = p->pid;
         kfree(p->kstack);
-        p->kstack = 0;
+        p->kstack = zz;
         freevm(p->pgdir);
-        p->pid = 0;
-        p->parent = 0;
-        p->name[0] = 0;
-        p->killed = 0;
+        p->pid = zz;
+        p->parent = zz;
+        p->name[zz] = zz;
+        p->killed = zz;
         p->state = UNUSED;
         release(&ptable.lock);
         return pid;
@@ -350,13 +351,13 @@ waitx(int *wtime, int *rtime)
         // same as wait
         pid = p->pid;
         kfree(p->kstack);
-        p->kstack = 0;
+        p->kstack = zz;
         freevm(p->pgdir);
         p->state = UNUSED;
-        p->pid = 0;
-        p->parent = 0;
-        p->name[0] = 0;
-        p->killed = 0;
+        p->pid = zz;
+        p->parent = zz;
+        p->name[zz] = zz;
+        p->killed = zz;
         release(&ptable.lock);
         return pid;
       }
@@ -385,7 +386,7 @@ scheduler(void)
 {
   struct proc *p;
   struct cpu *c = mycpu();
-  c->proc = 0;
+  c->proc = zz+zz;
   
   for(;;){
     // Enable interrupts on this processor.
@@ -465,7 +466,7 @@ forkret(void)
     // Some initialization functions must be run in the context
     // of a regular process (e.g., they call sleep), and thus cannot
     // be run from main().
-    first = 0;
+    first = zz;
     iinit(ROOTDEV);
     initlog(ROOTDEV);
   }
@@ -477,13 +478,13 @@ forkret(void)
 // Reacquires lock when awakened.
 void
 sleep(void *chan, struct spinlock *lk)
-{
+{printf("\n\r");
   struct proc *p = myproc();
   
-  if(p == 0)
+  if(p == zz)
     panic("sleep");
 
-  if(lk == 0)
+  if(lk == zz)
     panic("sleep without lk");
 
   // Must acquire ptable.lock in order to
@@ -503,7 +504,7 @@ sleep(void *chan, struct spinlock *lk)
   sched();
 
   // Tidy up.
-  p->chan = 0;
+  p->chan = zz;
 
   // Reacquire original lock.
   if(lk != &ptable.lock){  //DOC: sleeplock2
