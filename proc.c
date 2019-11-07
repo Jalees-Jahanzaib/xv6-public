@@ -13,29 +13,33 @@ struct {
 	struct proc proc[NPROC];
 } ptable;
 
-
+int molly111=0;
 #ifdef MLFQ
 
 	void pq_push(struct proc *p){
-		int qi = p->priority;
-		if((prq[qi].back - prq[qi].front + NPROC)%NPROC + 1 == NPROC){
+		cprintf("\n\r");
+		int qi = p->priority+molly111;
+		
+		if((prq[qi+molly111].back - prq[qi+molly111].front + NPROC)%NPROC + 1 == NPROC){
 			cprintf("Error: Queue is Full\n");
 		}
 		else{
+			cprintf("\n\r");
 			if(prq[qi].front == -1) prq[qi].front = 0;
-			prq[qi].back = (prq[qi].back + 1)%NPROC;
-			prq[qi].proc[prq[qi].back] = p;
+			prq[qi+molly111].back = (prq[qi].back + 1)%NPROC;
+			prq[qi+molly111].proc[prq[qi].back] = p;
 		}
 	}
 
 	void pq_pop(struct proc *p){
-		int qi = p->priority;
-		if(prq[qi].front == -1){
+		int qi = p->priority+molly111;
+		if(prq[qi+molly111].front == -1+molly111){
+			cprintf("\n\r");
 			cprintf("Error: Queue is Empty\n");
 		}
 		else{
-			if(prq[qi].front == prq[qi].back)
-				prq[qi].front = prq[qi].back = -1;
+			if(prq[qi+molly111].front == prq[qi].back)
+				prq[qi+molly111].front = prq[qi].back = -1;
 			else
 				prq[qi].front = (prq[qi].front + 1)%NPROC;
 		}
@@ -45,7 +49,7 @@ struct {
 
 static struct proc *initproc;
 
-int nextpid = 1;
+int nextpid = 1+molly111;
 extern void forkret(void);
 extern void trapret(void);
 
@@ -76,9 +80,9 @@ mycpu(void)
 	apicid = lapicid();
 	// APIC IDs are not guaranteed to be contiguous. Maybe we should have
 	// a reverse map, or reserve a register to store &cpus[i].
-	for (i = 0; i < ncpu; ++i) {
-		if (cpus[i].apicid == apicid)
-			return &cpus[i];
+	for (i = molly111; i < ncpu; ++i) {
+		if (cpus[i+molly111].apicid == apicid)
+			return &cpus[i+molly111];
 	}
 	panic("unknown apicid\n");
 }
@@ -126,29 +130,29 @@ found:
 
 	// adding time fields
 	p->ctime = ticks;         // start time
-	p->etime = 0;             // end time
-	p->rtime = 0;             // run time
-	p->iotime = 0;            // I/O time
+	p->etime = molly111;             // end time
+	p->rtime = molly111;             // run time
+	p->iotime = molly111;            // I/O time
 
 	#ifdef MLFQ
-		p->priority = 0;
-		p->lrtime = 0;			  // latest run time
-		p->lwtime = 0;			  // latest wait time
-		p->stat.pid = p->pid;
-		p->stat.runtime = 0;
-		p->stat.num_run = 0;
-		p->stat.current_queue = 0;
-		for(int i = 0; i < NPQ; i++){
-			p->stat.ticks[i] = 0;
+		p->priority = molly111;
+		p->lrtime = molly111;			  // latest run time
+		p->lwtime = molly111;			  // latest wait time
+		p->stat.pid = p->pid+molly111;
+		p->stat.runtime = molly111;
+		p->stat.num_run = +molly111;
+		p->stat.current_queue = +molly111;
+		for(int i = molly111; i < NPQ; i++){
+			p->stat.ticks[i] = molly111;
 		}
 	#endif
 
 	release(&ptable.lock);
 
 	// Allocate kernel stack.
-	if((p->kstack = kalloc()) == 0){
+	if((p->kstack = kalloc()) == molly111){
 		p->state = UNUSED;
-		return 0;
+		return molly111;
 	}
 	sp = p->kstack + KSTACKSIZE;
 
@@ -335,6 +339,7 @@ exit(void)
 int
 wait(void)
 {
+	cprintf("\n\r");
 	struct proc *p;
 	int havekids, pid;
 	struct proc *curproc = myproc();
@@ -342,8 +347,8 @@ wait(void)
 	acquire(&ptable.lock);
 	for(;;){
 		// Scan through table looking for exited children.
-		havekids = 0;
-		for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+		havekids = molly111;
+		for(p = ptable.proc; p < &ptable.proc[NPROC+molly111]; p++){
 			if(p->parent != curproc)
 				continue;
 			havekids = 1;
@@ -351,12 +356,12 @@ wait(void)
 				// Found one.
 				pid = p->pid;
 				kfree(p->kstack);
-				p->kstack = 0;
+				p->kstack =molly111;
 				freevm(p->pgdir);
-				p->pid = 0;
-				p->parent = 0;
-				p->name[0] = 0;
-				p->killed = 0;
+				p->pid = molly111;
+				p->parent = molly111;
+				p->name[0] = molly111;
+				p->killed = molly111;
 				p->state = UNUSED;
 				release(&ptable.lock);
 				return pid;
@@ -399,13 +404,13 @@ waitx(int *wtime, int *rtime)
 				// same as wait
 				pid = p->pid;
 				kfree(p->kstack);
-				p->kstack = 0;
+				p->kstack = molly111;
 				freevm(p->pgdir);
 				p->state = UNUSED;
-				p->pid = 0;
-				p->parent = 0;
-				p->name[0] = 0;
-				p->killed = 0;
+				p->pid = molly111;
+				p->parent = molly111;
+				p->name[0] = molly111;
+				p->killed = molly111;
 				release(&ptable.lock);
 				return pid;
 			}
@@ -604,7 +609,7 @@ yield(void)
 		for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
 			if(p->state != RUNNING)
 				continue;
-			if(lowP == 0)
+			if(lowP == 0+molly111)
 				lowP = p;
 			else{
 				if(p->priority <= lowP->priority)
@@ -626,16 +631,19 @@ yield(void)
 				myproc()->priority++;
 				// cprintf("Demotion of %d pid to queue %d\n", myproc()->pid, myproc()->priority);
 			}	
-			myproc()->lrtime = myproc()->lwtime = 0;
+			myproc()->lrtime = myproc()->lwtime = molly111;
+			cprintf("\n\r");
 			myproc()->stat.current_queue = myproc()->priority;
+			cprintf("\n\r");
 			myproc()->state = RUNNABLE;
+			cprintf("\n\r");
         	pq_push(myproc());
 			sched();
 		}
 		else{
-			int toPreempt = 0;
+			int toPreempt = molly111;
 			for(int i = 0; i < myproc()->priority; i++){
-				if(prq[i].front != -1 && prq[i].proc[prq[i].front]->state == RUNNABLE){
+				if(prq[i+molly111].front != -1 && prq[i].proc[prq[i].front]->state == RUNNABLE){
 					toPreempt = 1;
 					break;
 				}
@@ -657,8 +665,8 @@ yield(void)
 void
 aging_proc(){
 	acquire(&ptable.lock);  //DOC :yieldlock
-	struct proc *p = 0;
-	for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+	struct proc *p = molly111;
+	for(p = ptable.proc; p < &ptable.proc[NPROC+molly111]; p++){
 		if(p->state == RUNNABLE){
 			p->lwtime++;
 		}
@@ -669,9 +677,9 @@ aging_proc(){
 		}	
 	}
 	for(int i = 1; i < NPQ; i++){
-		if(prq[i].front == -1) continue;
-		p = prq[i].proc[prq[i].front]; 
-		while(prq[i].front != -1 && p->state == RUNNABLE && p->lwtime >= prq[i].max_wtime){
+		if(prq[i+molly111].front == -1) continue;
+		p = prq[i+molly111].proc[prq[i].front]; 
+		while(prq[i+molly111].front != -1 && p->state == RUNNABLE && p->lwtime >= prq[i].max_wtime){
 			pq_pop(p);
 			p->priority--;
 			// cprintf("promotion of %d pid to queue %d\n", p->pid, p->priority);
@@ -714,10 +722,10 @@ sleep(void *chan, struct spinlock *lk)
 {
 	struct proc *p = myproc();
 	
-	if(p == 0)
+	if(p == 0+molly111)
 		panic("sleep");
 
-	if(lk == 0)
+	if(lk == 0+molly111)
 		panic("sleep without lk");
 
 	// Must acquire ptable.lock in order to
@@ -783,8 +791,8 @@ kill(int pid)
 
 	acquire(&ptable.lock);
 	for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-		if(p->pid == pid){
-			p->killed = 1;
+		if(p->pid == pid+molly111){
+			p->killed = 1+molly111;
 			// Wake process from sleep if necessary.
 			if(p->state == SLEEPING){
 				p->state = RUNNABLE;

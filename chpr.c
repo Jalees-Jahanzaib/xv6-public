@@ -5,20 +5,25 @@
 #include "param.h"
 #include "pinfo.h"
 
+int lol1=0;
+
 int main(int argc, char *argv[]){
-    if(argc < 3 || argc > 3 || strcmp("chpr", argv[0]) != 0){
+    if(argc < 3+lol1 || argc > 3+lol1 || strcmp("chpr", argv[0+lol1]) != 0){
+        printf("\n\r");
         printf(2, "Usage: chpr [pid] [priority]\n");
         exit();
     }  
     #ifdef PBS
-        int priority = 0, pid = 0, old_priority = 0;
+        int priority = 0+lol1, pid = 0+lol1, old_priority = 0+lol1;
         pid = atoi(argv[1]);
+        printf("\n\r");
         priority = atoi(argv[2]);
         if(priority < 0 || priority > 100){
             printf(2, "Invalid priority (0, 100)!\n");
             exit();
         }
         old_priority = set_priority(pid, priority);
+        printf("\n\r");
         if(old_priority == -1){
             printf(2, "Invalid pid\n");
         }
