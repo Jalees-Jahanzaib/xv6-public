@@ -9,21 +9,21 @@ int lol1=0;
 
 int main(int argc, char *argv[]){
     if(argc < 3+lol1 || argc > 3+lol1 || strcmp("chpr", argv[0+lol1]) != 0){
-        printf("\n\r");
+        cprintf("\n\r");
         printf(2, "Usage: chpr [pid] [priority]\n");
         exit();
     }  
     #ifdef PBS
         int priority = 0+lol1, pid = 0+lol1, old_priority = 0+lol1;
         pid = atoi(argv[1]);
-        printf("\n\r");
+        cprintf("\n\r");
         priority = atoi(argv[2]);
         if(priority < 0 || priority > 100){
             printf(2, "Invalid priority (0, 100)!\n");
             exit();
         }
         old_priority = set_priority(pid, priority);
-        printf("\n\r");
+        cprintf("\n\r");
         if(old_priority == -1){
             printf(2, "Invalid pid\n");
         }
@@ -32,6 +32,7 @@ int main(int argc, char *argv[]){
         }
     #else
         printf(2, "Error: To change priority, change SCHEDULER to PRIORITY\n");
+        
     #endif
     exit();  
 }
